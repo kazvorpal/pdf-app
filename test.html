@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Proof of Concept</title>
+    <script type="text/javascript">
+		const checkForVideoAudioAccess = async () => {
+			try {
+				const cameraResult = await navigator.permissions.query({ name: 'camera' });
+				// The state property may be 'denied', 'prompt' and 'granted'
+				console.log('denied');
+				console.log(this.isCameraAccessGranted = cameraResult.state !== 'denied');
+
+
+				const microphoneResult = await navigator.permissions.query({ name: 'microphone' });
+				this.isMicrophoneAccessGranted = microphoneResult.state !== 'denied';
+			} catch(e) {
+				console.error('An error occurred while checking the site permissions', e);
+			}
+
+			return true;
+		}
+		console.log(checkForVideoAudioAccess());
+		navigator.permissions.query({ name: 'camera'}).then(permissionStatus => {
+			console.log(permissionStatus)
+		})
+		navigator.mediaDevices.getUserMedia({
+			video: !this.isMicrophoneAccessGranted,
+			audio: !this.isCameraAccessGranted
+		}).then(() => {
+			this.initStream();
+		});
+    </script>
+</head>
+<body>
+	<!-- <canvas id="imageconvertor" width="200" height="200"></canvas> -->
+    <h1></h1>
+    <input type="file" accept="image/*;capture=camera">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script type="text/javascript">
+        var pdf = new jsPDF()
+        var first = document.createElement("img");
+        const creator = (body, filename = "preamble.pdf", graphic) => {
+			pdf.addImage(first, 'PDF', 0, 0);
+			pdf.addImage(graphic, 'JPG', 0, 200);
+	        pdf.text(30, 100, body);
+	        pdf.save(filename);
+        }
+        const draw = () => {
+        	let canvas = document.getElementById("imageconvertor");
+        	let context = canvas.getContext("2d");
+        	console.log("drawing")
+        	// context.moveTo(0, 0);
+        	// context.lineTo(200, 100);
+        	// context.stroke();
+        	// context.beginPath();
+        	// context.arc(95, 50, 40, 0, 2*Math.PI);
+        	// context.stroke();
+        	// context.font = "30px Comic Sans";
+        	// context.fillText("Take my PDF.\tplease!", 10, 50);
+			let image = document.createElement("img");
+			image.src = "https://vignette.wikia.nocookie.net/schoolhouserock/images/c/ca/Thepreamble.JPG/revision/latest?cb=20131007180535";
+			// image.src = "https://fanart.tv/fanart/tv/78642/clearart/schoolhouse-rock-50feb40e866b6.png";
+			image.onload = function() {
+				context.drawImage(image, 0, 0);
+				// creator(text, filename, image);
+			}
+        	context.drawImage(image, 100, 100, 70, 50);
+        }
+
+
+let base64String = "";
+let testing = pdfjsLib.getDocument('https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf');
+testing.promise.then(function(pdf) {
+	console.log(pdf);
+	pdf.getPage(1).then(function(page) {
+		console.log(page);
+	})
+})
+
+function imageUploaded() {
+	var file = document.querySelector(
+		'input[type=file]')['files'][0];
+
+	var reader = new FileReader();
+	console.log("next");
+	
+	reader.onload = function () {
+		base64String = reader.result.replace("data:", "")
+			.replace(/^.+,/, "");
+
+		imageBase64Stringsep = base64String;
+
+		// alert(imageBase64Stringsep);
+		console.log(base64String);
+        creator(text, filename, base64String);
+
+	}
+	reader.readAsDataURL(file);
+}
+
+function displayString() {
+	console.log("Base64String about to be printed");
+	alert(base64String);
+}
+const loadfile = (event) => {
+	let up = document.createElement("img");
+	up.src = URL.createObjectURL(event.target.files[0]);
+	up.onload = function() {
+		creator(document.getElementById("contents").value, filename, up);
+	}
+}
+const firstfile = (event) => {
+	first.src = URL.createObjectURL(event.target.files[0]);
+}
+
+
+		const text = `		We the People of the United States, 
+		in Order to form a more perfect Union, 
+		establish Justice, 
+		insure domestic Tranquility, 
+		provide for the common defense, 
+		promote the general Welfare, 
+		and secure the Blessings of Liberty 
+		to ourselves and our Posterity, 
+		do ordain and establish this Constitution 
+		for the United States of America.`
+        // draw();
+        // let filename = prompt("What are we naming it?", 'preamble.pdf');
+        let filename = "preamble.pdf";
+    </script>
+    <input type="file" name="" id="fileId" onchange="firstfile(event)"><p>
+    <textarea id="contents" rows="12" cols="60">We the People of the United States, 
+in Order to form a more perfect Union, 
+establish Justice, 
+insure domestic Tranquility, 
+provide for the common defense, 
+promote the general Welfare, 
+and secure the Blessings of Liberty 
+to ourselves and our Posterity, 
+do ordain and establish this Constitution 
+for the United States of America.</textarea>
+</p>
+    <input type="file" name="" id="fileId" onchange="loadfile(event)">
+    <!-- <button onclick="displayString()">Display String</button> -->
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Proof of Concept</title>
+    <style type="text/css">
+    	body {
+		  width: 100vw;
+		  height: 100vh;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		  flex-direction: column;
+		}
+
+		p {
+		  font-family: helvetica;
+		  font-size: 24px;
+		  text-align: center;
+		  margin: 25px;
+		}
+
+		.small {
+		  font-family: helvetica;
+		  font-size: 18px;
+		  text-align: center;
+		  margin: 25px;
+		}
+
+		button {
+		  background-color: #008CBA;
+		  border: none;
+		  color: white;
+		  padding: 15px 32px;
+		  text-align: center;
+		  font-size: 16px;
+		}
+    </style>
+    <script src="https://unpkg.com/pdf-lib"></script>
+    <script type="text/javascript">
+    	const { PDFDocument } = PDFLib;
+
+async function embedPdfPages() {
+    // Fetch American flag PDF
+    const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
+        // Fetch U.S. constitution PDF
+        constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
+        flagPdfBytes = await fetch(flagUrl).then((res) => res.arrayBuffer()),
+        constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
+        // Create a new PDFDocument
+        pdfDoc = await PDFDocument.create();
+    
+    // Add a blank page to the document
+    var page = pdfDoc.addPage();
+    
+    // Embed the first page of the American flag PDF
+    const [americanFlag] = await pdfDoc.embedPdf(flagPdfBytes),
+        // Load the constitution PDF into a PDFDocument
+        usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
+        // Embed the first page of the constitution
+        firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
+
+    // Draw the American flag page
+    page.drawPage(americanFlag);
+    
+    //add a blank new page to the document
+    page = pdfDoc.addPage();
+    // Draw the first page of the constitution
+     page.drawPage(firstPageOfConstitution);
+    
+    // Serialize the PDFDocument to bytes (a Uint8Array)
+    const pdfBytes = await pdfDoc.save();
+    // Trigger the browser to download the PDF document
+    download(pdfBytes, "pdf-lib_pdf_page_embedding_example.pdf", "application/pdf");
+}
+    </script>
+</head>
+<body>
+	<!-- <canvas id="imageconvertor" width="200" height="200"></canvas> -->
+    <h1></h1>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+    <script type="text/javascript">
+    </script>
+<script src="https://unpkg.com/pdf-lib@1.4.0"></script>
+<script src="https://unpkg.com/downloadjs@1.4.7"></script>
+<p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
+<button onclick="embedPdfPages()">Create PDF</button>
+<p class="small">(Your browser will download the resulting file)</p>
+</body>
+</html>
