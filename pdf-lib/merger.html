@@ -107,7 +107,6 @@
                 const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
                     // Fetch U.S. constitution PDF
                     constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
-                    flagPdfBytes = await fetch(flagUrl).then((res) => res.arrayBuffer()),
                     constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
                     // Create a new PDFDocument
                     pdfDoc = await PDFDocument.create();
@@ -123,7 +122,7 @@
                 // const page = pdfDoc.addPage([350, 400]);
                 const page2 = pdfDoc.addPage([350, 400]);
                 const page3 = pdfDoc.addPage([350, 400]);
-                const page4 = pdfDoc.addPage([350, 400]);
+                // const page4 = pdfDoc.addPage([350, 400]);
                 const page5 = pdfDoc.addPage([350, 400]);
                 page2.drawImage(jpgImage, {
                     x: page2.getWidth() / 2 - jpgDims.width / 2,
@@ -141,14 +140,11 @@
                 })
 
 
-                const [americanFlag] = await pdfDoc.embedPdf(flagPdfBytes),
-                    // Load the constitution PDF into a PDFDocument
-                    usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
+                const usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
                     // Embed the first page of the constitution
-                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
+                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[1]);
 
                 // Draw the American flag page
-                page4.drawPage(americanFlag);
                 
                 page5.drawPage(firstPageOfConstitution);
 
