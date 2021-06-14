@@ -1,90 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Proof of Concept</title>
-    <style type="text/css">
-    	body {
-		  width: 100vw;
-		  height: 100vh;
-		  display: flex;
-		  justify-content: center;
-		  align-items: center;
-		  flex-direction: column;
-		}
+    <head>
+        <meta charset="utf-8">
+        <title>Proof of Concept</title>
+        <style type="text/css">
+            body {
+              width: 100vw;
+              height: 100vh;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-direction: column;
+            }
 
-		p {
-		  font-family: helvetica;
-		  font-size: 24px;
-		  text-align: center;
-		  margin: 25px;
-		}
+            p {
+              font-family: helvetica;
+              font-size: 24px;
+              text-align: center;
+              margin: 25px;
+            }
 
-		.small {
-		  font-family: helvetica;
-		  font-size: 18px;
-		  text-align: center;
-		  margin: 25px;
-		}
+            .small {
+              font-family: helvetica;
+              font-size: 18px;
+              text-align: center;
+              margin: 25px;
+            }
 
-		button {
-		  background-color: #008CBA;
-		  border: none;
-		  color: white;
-		  padding: 15px 32px;
-		  text-align: center;
-		  font-size: 16px;
-		}
-    </style>
-    <script src="https://unpkg.com/pdf-lib"></script>
-    <script type="text/javascript">
-    	const { PDFDocument } = PDFLib;
+            button {
+              background-color: #008CBA;
+              border: none;
+              color: white;
+              padding: 15px 32px;
+              text-align: center;
+              font-size: 16px;
+            }
+        </style>
+        <script src="https://unpkg.com/pdf-lib"></script>
 
-async function embedPdfPages() {
-    // Fetch American flag PDF
-    const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
-        // Fetch U.S. constitution PDF
-        constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
-        flagPdfBytes = await fetch(flagUrl).then((res) => res.arrayBuffer()),
-        constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
-        // Create a new PDFDocument
-        pdfDoc = await PDFDocument.create();
-    
-    // Add a blank page to the document
-    var page = pdfDoc.addPage();
-    
-    // Embed the first page of the American flag PDF
-    const [americanFlag] = await pdfDoc.embedPdf(flagPdfBytes),
-        // Load the constitution PDF into a PDFDocument
-        usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
-        // Embed the first page of the constitution
-        firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
+        <script type="text/javascript">
+            const { PDFDocument } = PDFLib;
 
-    // Draw the American flag page
-    page.drawPage(americanFlag);
-    
-    //add a blank new page to the document
-    page = pdfDoc.addPage();
-    // Draw the first page of the constitution
-     page.drawPage(firstPageOfConstitution);
-    
-    // Serialize the PDFDocument to bytes (a Uint8Array)
-    const pdfBytes = await pdfDoc.save();
-    // Trigger the browser to download the PDF document
-    download(pdfBytes, "pdf-lib_pdf_page_embedding_example.pdf", "application/pdf");
-}
-    </script>
-</head>
-<body>
-	<!-- <canvas id="imageconvertor" width="200" height="200"></canvas> -->
-    <h1></h1>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
-    <script type="text/javascript">
-    </script>
-<script src="https://unpkg.com/pdf-lib@1.4.0"></script>
-<script src="https://unpkg.com/downloadjs@1.4.7"></script>
-<p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
-<button onclick="embedPdfPages()">Create PDF</button>
-<p class="small">(Your browser will download the resulting file)</p>
-</body>
+            // import { PDFDocument } from 'pdf-lib'
+            // PDF Creation
+            // const pdfDoc = await PDFDocument.create()
+            // const page = pdfDoc.addPage()
+            // page.drawText('You can create PDFs!')
+            // const pdfBytes = await pdfDoc.save()
+
+            async function embedPdfPages() {
+                // Fetch American flag PDF
+                const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
+                    // Fetch U.S. constitution PDF
+                    constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
+                    flagPdfBytes = await fetch(flagUrl).then((res) => res.arrayBuffer()),
+                    constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
+                    // Create a new PDFDocument
+                    pdfDoc = await PDFDocument.create();
+                
+                // Add a blank page to the document
+                var page = pdfDoc.addPage();
+                
+                // Embed the first page of the American flag PDF
+                const [americanFlag] = await pdfDoc.embedPdf(flagPdfBytes),
+                    // Load the constitution PDF into a PDFDocument
+                    usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
+                    // Embed the first page of the constitution
+                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
+
+                // Draw the American flag page
+                page.drawPage(americanFlag);
+                
+                //add a blank new page to the document
+                page = pdfDoc.addPage();
+                // Draw the first page of the constitution
+                 page.drawPage(firstPageOfConstitution);
+                
+                // Serialize the PDFDocument to bytes (a Uint8Array)
+                const pdfBytes = await pdfDoc.save();
+                // Trigger the browser to download the PDF document
+                download(pdfBytes, "pdf-lib_pdf_page_embedding_example.pdf", "application/pdf");
+            }
+        </script>
+    </head>
+    <body>
+        <!-- <canvas id="imageconvertor" width="200" height="200"></canvas> -->
+        <h1></h1>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+        <script type="text/javascript">
+        </script>
+        <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
+        <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+        <p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
+        <button onclick="createPdf('save')">Download PDF</button>
+        <p class="small">(Your browser will download the resulting file)</p>
+        <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
+    </body>
+        <script type="text/javascript">
+            createPdf();
+            async function createPdf(context = 'display') {
+                const jpgUrl = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg'
+                const pngUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Wisconsin_in_United_States.svg/1200px-Wisconsin_in_United_States.svg.png'
+                const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer())
+                const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
+
+                const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
+                    // Fetch U.S. constitution PDF
+                    constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
+                    flagPdfBytes = await fetch(flagUrl).then((res) => res.arrayBuffer()),
+                    constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
+                    // Create a new PDFDocument
+                    pdfDoc = await PDFDocument.create();
+                
+                // Add a blank page to the document
+
+                const jpgImage = await pdfDoc.embedJpg(jpgImageBytes);
+                const pngImage = await pdfDoc.embedPng(pngImageBytes);
+                const jpgDims = jpgImage.scale(0.5)
+                const pngDims = pngImage.scale(0.5)
+
+
+                // const page = pdfDoc.addPage([350, 400]);
+                const page2 = pdfDoc.addPage([350, 400]);
+                const page3 = pdfDoc.addPage([350, 400]);
+                const page4 = pdfDoc.addPage([350, 400]);
+                const page5 = pdfDoc.addPage([350, 400]);
+                page2.drawImage(jpgImage, {
+                    x: page2.getWidth() / 2 - jpgDims.width / 2,
+                    y: page2.getHeight() / 2 - jpgDims.height / 2 + 250,
+                    width: jpgDims.width,
+                    height: jpgDims.height,
+                })
+                page2.moveTo(55, 200);
+                page2.drawText('Welfare Recipient Info');
+                page3.drawImage(pngImage, {
+                    x: page3.getWidth() / 2 - pngDims.width / 2 + 75,
+                    y: page3.getHeight() / 2 - pngDims.height + 250,
+                    width: pngDims.width,
+                    height: pngDims.height,
+                })
+
+
+                const [americanFlag] = await pdfDoc.embedPdf(flagPdfBytes),
+                    // Load the constitution PDF into a PDFDocument
+                    usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
+                    // Embed the first page of the constitution
+                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
+
+                // Draw the American flag page
+                page4.drawPage(americanFlag);
+                
+                page5.drawPage(firstPageOfConstitution);
+
+                if (context == "save") {
+                    const pdfBytes = await pdfDoc.save();
+                    // Trigger the browser to download the PDF document
+                    download(pdfBytes, "pdf-lib_pdf_page_embedding_example.pdf", "application/pdf");
+                } else {
+                    const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
+                    document.getElementById('pdf').src = pdfDataUri;
+                }
+            }
+        </script>
 </html>
