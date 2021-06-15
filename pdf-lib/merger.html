@@ -100,10 +100,12 @@
             
             createPdf();
             async function createPdf(context = 'display') {
-                const jpgUrl = 'https://pdf-lib.js.org/assets/cat_riding_unicorn.jpg'
-                const pngUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Wisconsin_in_United_States.svg/1200px-Wisconsin_in_United_States.svg.png'
-                const jpgImageBytes = await fetch(jpgUrl).then((res) => res.arrayBuffer())
-                const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
+                let images = {
+                    jpgUrl: 'https://constitutingamerica.org/wp-content/uploads/2019/04/StateWisconsinSign.jpg', 
+                    pngUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Wisconsin_in_United_States.svg/1200px-Wisconsin_in_United_States.svg.png'
+                }
+                const jpgImageBytes = await fetch(images["jpgUrl"]).then((res) => res.arrayBuffer())
+                const pngImageBytes = await fetch(images["pngUrl"]).then((res) => res.arrayBuffer())
 
                 const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
                     // Fetch U.S. constitution PDF
@@ -126,10 +128,10 @@
                 // const page4 = pdfDoc.addPage([350, 400]);
                 const page5 = pdfDoc.addPage([350, 400]);
                 page2.drawImage(jpgImage, {
-                    x: page2.getWidth() / 2 - jpgDims.width / 2,
-                    y: page2.getHeight() / 2 - jpgDims.height / 2 + 250,
-                    width: jpgDims.width,
-                    height: jpgDims.height,
+                    x: page2.getWidth() / 2 - jpgDims.width / 4,
+                    y: page2.getHeight() / 2 - jpgDims.height / 8,
+                    width: jpgDims.width/2,
+                    height: jpgDims.height/2,
                 })
                 // const svgPath = 'M 0,20 L 100,160 Q 130,200 150,120 C 190,-40 200,200 300,150 L 400,90'
   
@@ -147,13 +149,13 @@
                 //   page3.moveDown(200)
                 //   page3.drawSvgPath(svgPath, { scale: 0.5 })
                   
-                page2.moveTo(55, 200);
+                page2.moveTo(55, 100);
                 page2.drawText('Welfare Recipient Info');
                 page3.drawImage(pngImage, {
-                    x: page3.getWidth() / 2 - pngDims.width / 2 + 75,
+                    x: page3.getWidth() / 2 - pngDims.width / 2 + 150,
                     y: page3.getHeight() / 2 - pngDims.height + 250,
-                    width: pngDims.width,
-                    height: pngDims.height,
+                    width: pngDims.width/2,
+                    height: pngDims.height/2,
                 })
 
 
