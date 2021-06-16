@@ -86,30 +86,54 @@
     <body>
         <!-- <canvas id="imageconvertor" width="200" height="200"></canvas> -->
         <h1></h1>
+        <input type="file" name="" id="fileone" onchange="firstfile(event)"><p>
+        <input type="file" name="" id="filetwo" onchange="secondfile(event)"><p>
+        <input type="file" name="" id="filethree" onchange="thirdfile(event)"><p>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
         <script type="text/javascript">
         </script>
         <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
         <script src="https://unpkg.com/downloadjs@1.4.7"></script>
         <p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
+        <button onclick="createPdf('display')">View PDF</button>
+        <br/>
         <button onclick="createPdf('save')">Download PDF</button>
         <p class="small">(Your browser will download the resulting file)</p>
         <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
     </body>
         <script type="text/javascript">
             
-            createPdf();
+            // createPdf();
+
+            var first = document.createElement("img");
+            var second = document.createElement("img");
+            var third;
+            const firstfile = (event) => {
+                first.src = URL.createObjectURL(event.target.files[0]);
+                var image1 = URL.createObjectURL(event.target.files[0])
+            }
+            const secondfile = (event) => {
+                second.src = URL.createObjectURL(event.target.files[0]);
+                console.log(second.src)
+                var image2 = URL.createObjectURL(event.target.files[0])
+            }
+            const thirdfile = (event) => {
+                third = URL.createObjectURL(event.target.files[0]);
+                console.log(third);
+                // var image3 = URL.createObjectURL(event.target.files[0])
+            }
+
             async function createPdf(context = 'display') {
                 let images = {
-                    jpgUrl: 'https://constitutingamerica.org/wp-content/uploads/2019/04/StateWisconsinSign.jpg', 
-                    pngUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Wisconsin_in_United_States.svg/1200px-Wisconsin_in_United_States.svg.png'
+                    jpgUrl: first.src, 
+                    pngUrl: second.src
                 }
                 const jpgImageBytes = await fetch(images["jpgUrl"]).then((res) => res.arrayBuffer())
                 const pngImageBytes = await fetch(images["pngUrl"]).then((res) => res.arrayBuffer())
 
                 const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
                     // Fetch U.S. constitution PDF
-                    constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
+                    constitutionUrl = third,
                     constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
                     // Create a new PDFDocument
                     pdfDoc = await PDFDocument.create();
@@ -150,7 +174,7 @@
                 //   page3.drawSvgPath(svgPath, { scale: 0.5 })
                   
                 page2.moveTo(55, 100);
-                page2.drawText('Welfare Recipient Info');
+                // page2.drawText('Welfare Recipient Info');
                 page3.drawImage(pngImage, {
                     x: page3.getWidth() / 2 - pngDims.width / 2 + 150,
                     y: page3.getHeight() / 2 - pngDims.height + 250,
@@ -161,11 +185,14 @@
 
                 const usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
                     // Embed the first page of the constitution
-                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[1]);
+                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
 
                 // Draw the American flag page
                 
-                page5.drawPage(firstPageOfConstitution);
+                page5.drawPage(firstPageOfConstitution, {
+                    width: page5.getWidth(),
+                    height: page5.getHeight()
+                });
 
                 if (context == "save") {
                     const pdfBytes = await pdfDoc.save();
