@@ -48,48 +48,17 @@
             // page.drawText('You can create PDFs!')
             // const pdfBytes = await pdfDoc.save()
 
-            async function embedPdfPages() {
-                // Fetch American flag PDF
-                const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
-                    // Fetch U.S. constitution PDF
-                    constitutionUrl = 'https://pdf-lib.js.org/assets/us_constitution.pdf',
-                    flagPdfBytes = await fetch(flagUrl).then((res) => res.arrayBuffer()),
-                    constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
-                    // Create a new PDFDocument
-                    pdfDoc = await PDFDocument.create();
-                
-                // Add a blank page to the document
-                var page = pdfDoc.addPage();
-                
-                // Embed the first page of the American flag PDF
-                const [americanFlag] = await pdfDoc.embedPdf(flagPdfBytes),
-                    // Load the constitution PDF into a PDFDocument
-                    usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
-                    // Embed the first page of the constitution
-                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[0]);
-
-                // Draw the American flag page
-                page.drawPage(americanFlag);
-                
-                //add a blank new page to the document
-                page = pdfDoc.addPage();
-                // Draw the first page of the constitution
-                 page.drawPage(firstPageOfConstitution);
-                
-                // Serialize the PDFDocument to bytes (a Uint8Array)
-                const pdfBytes = await pdfDoc.save();
-                // Trigger the browser to download the PDF document
-                download(pdfBytes, "pdf-lib_pdf_page_embedding_example.pdf", "application/pdf");
-            }
         </script>
     </head>
     <body>
-        <!-- <canvas id="imageconvertor" width="200" height="200"></canvas> -->
-        <input type="file" name="" id="fileone" onchange="firstfile(event)"><p>
+        <!-- <canvas id="imageconvertor" width="200" height="200"></canvas> --><p>
+        <input type="file" name="" id="filezero" onchange="processfile(event)"></p>
         <h1></h1>
-        <input type="file" name="" id="fileone" onchange="firstfile(event)"><p>
-        <input type="file" name="" id="filetwo" onchange="secondfile(event)"><p>
-        <input type="file" name="" id="filethree" onchange="thirdfile(event)"><p>
+        <p>
+        <input type="file" name="" id="fileone" onchange="firstfile(event)"></p>
+        <p>
+        <input type="file" name="" id="filetwo" onchange="secondfile(event)"></p><p>
+        <input type="file" name="" id="filethree" onchange="thirdfile(event)"></p>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
         <script type="text/javascript">
         </script>
@@ -109,6 +78,16 @@
             var first = document.createElement("img");
             var second = document.createElement("img");
             var third;
+            var filist = [];
+            var files = [];
+
+            const processfile = (event) => {
+                console.log(event)
+                filist.push(URL.createObjectURL(event.target.files[0]));
+                files.push(event.target);
+                console.log(files);
+                console.log(filist);
+            }
             const firstfile = (event) => {
                 first.src = URL.createObjectURL(event.target.files[0]);
                 var image1 = URL.createObjectURL(event.target.files[0]);
