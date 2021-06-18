@@ -36,35 +36,18 @@
               font-size: 16px;
             }
         </style>
-        <script src="https://unpkg.com/pdf-lib"></script>
-
-        <script type="text/javascript">
-            const { PDFDocument } = PDFLib;
-
-            // import { PDFDocument } from 'pdf-lib'
-            // PDF Creation
-            // const pdfDoc = await PDFDocument.create()
-            // const page = pdfDoc.addPage()
-            // page.drawText('You can create PDFs!')
-            // const pdfBytes = await pdfDoc.save()
-
-        </script>
+        <script src="pdf-lib.min.js"></script>
     </head>
     <body>
         <!-- <canvas id="imageconvertor" width="200" height="200"></canvas> --><p>
         <input type="file" name="" id="filezero" onchange="processfile(event)"></p>
-        <h1></h1>
-        <p>
-        <input type="file" name="" id="fileone" onchange="firstfile(event)"></p>
-        <p>
-        <input type="file" name="" id="filetwo" onchange="secondfile(event)"></p><p>
-        <input type="file" name="" id="filethree" onchange="thirdfile(event)"></p>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
         <script type="text/javascript">
         </script>
-        <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
+        <!-- <script src="https://unpkg.com/pdf-lib"></script> -->
+<!--         <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
         <script src="https://unpkg.com/downloadjs@1.4.7"></script>
-        <p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
+ -->        <p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
         <button onclick="createPdf('display')">View PDF</button>
         <br/>
         <button onclick="createPdf('save')">Download PDF</button>
@@ -72,107 +55,67 @@
         <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
     </body>
         <script type="text/javascript">
+            const { PDFDocument } = PDFLib;
             
             // createPdf();
 
-            var first = document.createElement("img");
-            var second = document.createElement("img");
-            var third;
             var filist = [];
             var files = [];
+            var sizelimit = 1000000;
+            var types = ["image/png", "image/jpeg", "image/gif", "application/pdf"];
 
             const processfile = (event) => {
-                console.log(event)
-                filist.push(URL.createObjectURL(event.target.files[0]));
-                files.push(event.target);
-                console.log(files);
-                console.log(filist);
-            }
-            const firstfile = (event) => {
-                first.src = URL.createObjectURL(event.target.files[0]);
-                var image1 = URL.createObjectURL(event.target.files[0]);
-            }
-            const secondfile = (event) => {
-                second.src = URL.createObjectURL(event.target.files[0]);
-                console.log(second.src)
-                var image2 = URL.createObjectURL(event.target.files[0]);
-            }
-            const thirdfile = (event) => {
-                third = URL.createObjectURL(event.target.files[0]);
-                console.log(third);
-                // var image3 = URL.createObjectURL(event.target.files[0])
-            }
-
-            async function createPdf(context = 'display') {
-                let images = {
-                    jpgUrl: first.src, 
-                    pngUrl: second.src
+                if (event.target.files[0].size < sizelimit||true) {
+                    console.log(event.target.files[0].size + " is smaller than " + sizelimit);
+                    if (types.includes(event.target.files[0].type)) {
+                        console.log("contains legit type");
+                        files.push(event.target.files[0]);
+                        files[files.length-1].url = (URL.createObjectURL(event.target.files[0]));
+                        // filist.push(URL.createObjectURL(event.target.files[0]));
+                        console.log(files);
+                        // console.log(filist);
+                    } else {
+                        alert("contains bogus file type");
+                        console.log(event.target.files[0]);
+                    }
+                } else {
+                    console.log(event.target.files[0].size + " is smaller than " + sizelimit);
+                    alert("Sorry, that's too big! The allowed file size is " + sizelimit)
                 }
-                const jpgImageBytes = await fetch(images["jpgUrl"]).then((res) => res.arrayBuffer())
-                const pngImageBytes = await fetch(images["pngUrl"]).then((res) => res.arrayBuffer())
+            }
+            const typify = (type) => {
+                    ty = type.substr(type.indexOf("/")+1)
+                    pe = (ty=="jpeg") ? "jpg" : ty;
+                    tpe = pe.charAt(0).toUpperCase() + pe.slice(1)
+                    return (tpe);
+            }
 
-                const flagUrl = 'https://pdf-lib.js.org/assets/american_flag.pdf',
-                    // Fetch U.S. constitution PDF
-                    constitutionUrl = third,
-                    constitutionPdfBytes = await fetch(constitutionUrl).then((res) => res.arrayBuffer()),
-                    // Create a new PDFDocument
-                    pdfDoc = await PDFDocument.create();
-                
-                // Add a blank page to the document
+            const createPdf = async (context = 'display') => {
+                pdfDoc = await PDFDocument.create();
+                for (file of files) {
+                    bytes = await fetch(file.url).then((res) => res.arrayBuffer())
+                    console.log(file);
+                    tipe = typify(file.type);
+                    if (tipe == "Pdf") {
+                        fullpdf = await PDFDocument.load(bytes, {ignoreEncryption: true})
+                        for(count = 0; count < fullpdf.getPages().length; count++) {
+                            page = pdfDoc.addPage();
+                            thepdf = await pdfDoc.embedPage(fullpdf.getPages()[count]);
+                            page.drawPage(thepdf, {
+                                width: page.getWidth(),
+                                height: page.getHeight()
+                            });
+                        }
+                    } else {
+                        page = pdfDoc.addPage();
+                        const image = await pdfDoc["embed" + tipe](bytes);
+                        // const dims = image.scale(0.5)
+                        page.drawImage(image, {
+                        })
+                        page.moveTo(55, 100);
+                    }
+                }
 
-                const jpgImage = await pdfDoc.embedJpg(jpgImageBytes);
-                const pngImage = await pdfDoc.embedPng(pngImageBytes);
-                const jpgDims = jpgImage.scale(0.5)
-                const pngDims = pngImage.scale(0.5)
-
-
-                // const page = pdfDoc.addPage([350, 400]);
-                const page2 = pdfDoc.addPage([350, 400]);
-                const page3 = pdfDoc.addPage([350, 400]);
-                // const page4 = pdfDoc.addPage([350, 400]);
-                const page5 = pdfDoc.addPage([350, 400]);
-                page2.drawImage(jpgImage, {
-                    x: page2.getWidth() / 2 - jpgDims.width / 4,
-                    y: page2.getHeight() / 2 - jpgDims.height / 8,
-                    width: jpgDims.width/2,
-                    height: jpgDims.height/2,
-                })
-                // const svgPath = 'M 0,20 L 100,160 Q 130,200 150,120 C 190,-40 200,200 300,150 L 400,90'
-  
-                //   page3.moveTo(100, page3.getHeight() - 5)
-                  
-                //   page3.moveDown(25)
-                //   page3.drawSvgPath(svgPath)
-                  
-                //   page3.moveDown(200)
-                //   page3.drawSvgPath(svgPath, { borderColor: rgb(0, 1, 0), borderWidth: 5 })
-                  
-                //   page3.moveDown(200)
-                //   page3.drawSvgPath(svgPath, { color: rgb(1, 0, 0) })
-                  
-                //   page3.moveDown(200)
-                //   page3.drawSvgPath(svgPath, { scale: 0.5 })
-                  
-                page2.moveTo(55, 100);
-                // page2.drawText('Welfare Recipient Info');
-                page3.drawImage(pngImage, {
-                    x: page3.getWidth() / 2 - pngDims.width / 2 + 150,
-                    y: page3.getHeight() / 2 - pngDims.height + 250,
-                    width: pngDims.width/2,
-                    height: pngDims.height/2,
-                })
-
-
-                const usConstitutionPdf = await PDFDocument.load(constitutionPdfBytes),
-                    // Embed the first page of the constitution
-                    firstPageOfConstitution = await pdfDoc.embedPage(usConstitutionPdf.getPages()[1]);
-
-                // Draw the American flag page
-                
-                page5.drawPage(firstPageOfConstitution, {
-                    width: page5.getWidth(),
-                    height: page5.getHeight()
-                });
 
                 if (context == "save") {
                     const pdfBytes = await pdfDoc.save();
