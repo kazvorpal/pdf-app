@@ -35,37 +35,34 @@
               text-align: center;
               font-size: 16px;
             }
+            .status {
+                position: fixed;
+                top: 0;
+                right: 0;
+                border: 1px outset #eee;
+                width: 25%;
+                height: 28%;
+                padding: 12px;
+                overflow: auto;
+            }
+            .icon {
+                width: 32px;
+                vertical-align: middle;
+            }
+            .close {
+                float: right;
+                cursor: pointer;
+            }
         </style>
         <script src="pdf-lib.min.js"></script>
-    </head>
-    <body>
-        <!-- <canvas id="imageconvertor" width="200" height="200"></canvas> --><p>
-        <input type="file" name="" id="filezero" onchange="processfile(event)"></p>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
-        <script type="text/javascript">
-        </script>
-        <!-- <script src="https://unpkg.com/pdf-lib"></script> -->
-<!--         <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
-        <script src="https://unpkg.com/downloadjs@1.4.7"></script>
- -->        <p>Click the button to embed PDF pages with <code>pdf-lib</code></p>
-        <button onclick="createPdf('display')">View PDF</button>
-        <br/>
-        <button onclick="createPdf('save')">Download PDF</button>
-        <p class="small">(Your browser will download the resulting file)</p>
-        <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
-    </body>
         <script type="text/javascript">
             const { PDFDocument } = PDFLib;
-            
-            // createPdf();
-
-            var filist = [];
+            const sizelimit = 1000000;
+            const types = ["image/png", "image/jpeg", "image/gif", "application/pdf"];
             var files = [];
-            var sizelimit = 1000000;
-            var types = ["image/png", "image/jpeg", "image/gif", "application/pdf"];
 
             const processfile = (event) => {
-                if (event.target.files[0].size < sizelimit||true) {
+                if (event.target.files[0].size < sizelimit) {
                     console.log(event.target.files[0].size + " is smaller than " + sizelimit);
                     if (types.includes(event.target.files[0].type)) {
                         console.log("contains legit type");
@@ -82,12 +79,35 @@
                     console.log(event.target.files[0].size + " is smaller than " + sizelimit);
                     alert("Sorry, that's too big! The allowed file size is " + sizelimit)
                 }
+                populate()
+            }
+            const populate = () => {
+                list = document.getElementById("status");
+                list.innerHTML = "";
+                for ([index, file] of files.entries()) {
+                    hr = document.createElement("hr");
+                    icon = document.createElement("img");
+                    icon.src = typify(file.type) + ".png";
+                    icon.className = "icon";
+                    close = document.createElement("a")
+                    close.className = "close"
+                    close.onclick = function() {
+                        console.log(index)
+                        files.splice(index-1, 1);
+                        populate();
+                    }
+                    close.innerHTML = "X"
+                    text = document.createTextNode(file.name)
+                    list.appendChild(icon);
+                    list.appendChild(text);
+                    list.appendChild(close);
+                    list.appendChild(hr);
+                }
             }
             const typify = (type) => {
-                    ty = type.substr(type.indexOf("/")+1)
-                    pe = (ty=="jpeg") ? "jpg" : ty;
-                    tpe = pe.charAt(0).toUpperCase() + pe.slice(1)
-                    return (tpe);
+                    let ty = type.substr(type.indexOf("/")+1)
+                    let pe = (ty=="jpeg") ? "jpg" : ty;
+                    return(tpe = pe.charAt(0).toUpperCase() + pe.slice(1));
             }
 
             const createPdf = async (context = 'display') => {
@@ -109,17 +129,18 @@
                     } else {
                         page = pdfDoc.addPage();
                         const image = await pdfDoc["embed" + tipe](bytes);
-                        // const dims = image.scale(0.5)
+                        const dims = image.scale(1)
                         page.drawImage(image, {
+                            x: page.getWidth() / 2 - dims.width / 2 + 50,
+                            y: page.getHeight() / 2 - dims.height + 250,
+                            width: dims.width,
+                            height: dims.height,
                         })
                         page.moveTo(55, 100);
                     }
                 }
-
-
                 if (context == "save") {
                     const pdfBytes = await pdfDoc.save();
-                    // Trigger the browser to download the PDF document
                     download(pdfBytes, "pdf-lib_pdf_page_embedding_example.pdf", "application/pdf");
                 } else {
                     const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
@@ -127,4 +148,15 @@
                 }
             }
         </script>
+    </head>
+    <body>
+        <div class="status" id="status"></div>
+        <p>
+        <input type="file" name="" id="filezero" onchange="processfile(event)"></p>
+        <p>Upload Your Docs</p>
+        <button onclick="createPdf('display')">View PDF</button>
+        <br/>
+        <button onclick="createPdf('save')">Download PDF</button>
+        <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
+    </body>
 </html>
