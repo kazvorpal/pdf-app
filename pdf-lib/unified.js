@@ -6,8 +6,7 @@ const types = ["image/png", "image/jpeg", "image/gif", "application/pdf"];
 var files = [];
 
 const processfile = (event) => {
-        // Process file added to 
-    console.log(event)
+        // Process file added to the form field
     for (file of event.target.files) {
         if (file.size < sizelimit) {
             console.log(file.size + " is smaller than " + sizelimit);
@@ -40,11 +39,10 @@ const populate = () => {
         close = document.createElement("a")
         close.className = "close"
         close.onclick = function() {
-            console.log(index)
             files.splice(index-1, 1);
             populate();
         }
-        close.innerHTML = "X"
+        close.innerHTML = "X";
         text = document.createTextNode(file.name)
         list.appendChild(icon);
         list.appendChild(text);
@@ -60,7 +58,6 @@ const typify = (type) => {
 }
 const imagestats = (item, pdfpage) => {
         // return object with info about item's placement in PDF
-        // img {height, width, x, y}
     let img = {};
     var wr = (item.width > pdfwidth) ? item.width/pdfwidth : 1;
     var hr = (item.width > pdfheight) ? item.width/pdfheight : 1;
@@ -93,7 +90,6 @@ const createPdf = async (context = 'display') => {
     pdfDoc = await PDFDocument.create();
     for (file of files) {
         bytes = await fetch(file.url).then((res) => res.arrayBuffer());
-        console.log(file);
         tipe = typify(file.type);
         if (tipe == "Pdf") {
             fullpdf = await PDFDocument.load(bytes, {ignoreEncryption: true})
