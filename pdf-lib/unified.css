@@ -47,3 +47,6 @@
                 float: right;
                 cursor: pointer;
             }
+            #pdf {
+              display: none;
+            }

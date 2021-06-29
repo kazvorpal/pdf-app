@@ -8,7 +8,7 @@ var files = [];
 const processfile = (event) => {
         // Process file added to the form field
     for (file of event.target.files) {
-        if (file.size < sizelimit) {
+        // if (file.size < sizelimit) {
             console.log(file.size + " is smaller than " + sizelimit);
             if (types.includes(file.type)) {
                 console.log("contains legit type");
@@ -19,10 +19,10 @@ const processfile = (event) => {
                 alert("contains bogus file type");
                 console.log(file);
             }
-        } else {
-            console.log(file.size + " is larger than " + sizelimit);
-            alert("Sorry, that's too big! The allowed file size is " + sizelimit)
-        }
+        // } else {
+        //     console.log(file.size + " is larger than " + sizelimit);
+        //     alert("Sorry, that's too big! The allowed file size is " + sizelimit)
+        // }
         populate()
     }
 }
@@ -89,8 +89,12 @@ const createPdf = async (context = 'display') => {
         // Create PDF by looping through files 
     pdfDoc = await PDFDocument.create();
     for (file of files) {
-        bytes = await fetch(file.url).then((res) => res.arrayBuffer());
-        tipe = typify(file.type);
+        console.log("file.url");
+        console.log(file.url);
+        // let fetchedFile = await fetch(file.url);
+        // let bytes = await fetchedFile.arrayBuffer();
+        let bytes = await fetch(file.url).then((res) => res.arrayBuffer());
+        let tipe = typify(file.type);
         if (tipe == "Pdf") {
             fullpdf = await PDFDocument.load(bytes, {ignoreEncryption: true})
             for(count = 0; count < fullpdf.getPages().length; count++) {
@@ -111,7 +115,7 @@ const createPdf = async (context = 'display') => {
                 width: img.width,
                 height: img.height,
             })
-            page.moveTo(55, 100);
+            // page.moveTo(55, 100);
         }
     }
     if (context == "save") {
